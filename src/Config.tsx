@@ -10,6 +10,7 @@ type Props = {
 export default function AppConfiguration({ id }: Props) {
   const [info, setInfo] = useState<ReturnType<typeof fetchAppInfo> extends Promise<infer T> ? T : never | null>(null);
   const [json, setJson] = useState<string>("");
+  const [dirty, setDirty] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -17,7 +18,7 @@ export default function AppConfiguration({ id }: Props) {
       fetchAppInfo(id).then(data => {
         if (mounted) {
           setInfo(data);
-          setJson(JSON.stringify(data.configValue, null, 2));
+          if (!dirty) setJson(JSON.stringify(data.configuration, null, 2));
         }
       });
     }
@@ -27,7 +28,12 @@ export default function AppConfiguration({ id }: Props) {
       mounted = false;
       clearInterval(interval);
     };
-  }, [id]);
+  }, [id, dirty]);
+
+  function handleJsonChange(v: string) {
+    setJson(v);
+    setDirty(true);
+  }
 
   if (!info) return <div>Loading...</div>;
 
@@ -35,15 +41,15 @@ export default function AppConfiguration({ id }: Props) {
     <div className="config-root">
       <h2>{id}</h2>
       <div className="nodes-list-row">
-        {info.nodes.map(node =>
-          <NodeCard key={node.id} id={node.id} status={node.status} version={node.version} />
+        {Object.entries(info.nodes).map(([nodeId, node]) =>
+          <NodeCard key={nodeId} id={nodeId} status={node.status} version={node.version ?? ""} />
         )}
       </div>
       <JsonConfigEditor
         value={json}
-        onChange={setJson}
-        schema={info.configSchema}
-        configValue={info.configValue}
+        onChange={handleJsonChange}
+        schema={info.schema}
+        configValue={info.configuration}
       />
     </div>
   );
