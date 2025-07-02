@@ -1,6 +1,6 @@
 import './App.css'
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import AppConfiguration from './Config';
+import AppConfiguration from './AppConfiguration';
 import { useEffect, useState } from 'react';
 import { fetchApps } from './api';
 
@@ -14,19 +14,22 @@ function App() {
   return (
     <BrowserRouter>
       <div className="whole">
-        <nav>
-          {apps.map(app =>
-            <Link key={app.id} to={`/${app.id}`}>{app.name}</Link>
-          )}
-        </nav>
-        <main>
-          <Routes>
+        <div className="layout-container">
+          <nav>
+            <header>Applications</header>
             {apps.map(app =>
-              <Route key={app.id} path={`/${app.id}`} element={<AppConfiguration id={app.id} />} />
+              <Link key={app.id} to={`/${app.id}`}>{app.name}</Link>
             )}
-            <Route path="*" element={apps.length > 0 ? <AppConfiguration id={apps[0].id} /> : null} />
-          </Routes>
-        </main>
+          </nav>
+          <main>
+            <Routes>
+              {apps.map(app =>
+                <Route key={app.id} path={`/${app.id}`} element={<AppConfiguration id={app.id} />} />
+              )}
+              <Route path="*" element={apps.length > 0 ? <AppConfiguration id={apps[0].id} /> : null} />
+            </Routes>
+          </main>
+        </div>
       </div>
     </BrowserRouter>
   );

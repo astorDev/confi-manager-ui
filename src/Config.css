@@ -1,0 +1,18 @@
+/* Styles for AppConfiguration (AppConfiguration.tsx) */
+.app-config-root {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.app-config-nodes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.app-config-nodes-list-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
