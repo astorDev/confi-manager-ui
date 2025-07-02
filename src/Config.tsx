@@ -1,48 +1,50 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import NodeCard from "./NodeCard";
+import JsonConfigEditor from "./JsonConfigEditor";
+import { fetchAppInfo } from "./api";
 
 type Props = {
   id: string;
 };
 
-type Node = {
-  id: string;
-  status: "synced" | "unsynced";
-  version: string;
-};
-
-const mockNodes: Node[] = [
-  { id: "node-1", status: "synced", version: "1.0.0" },
-  { id: "node-2", status: "unsynced", version: "1.0.1" },
-  { id: "node-3", status: "synced", version: "1.1.0" }
-];
-
-const mockConfig = {
-  settingA: true,
-  settingB: "value",
-  nodes: ["node-1", "node-2", "node-3"]
-};
-
 export default function AppConfiguration({ id }: Props) {
-  const [json, setJson] = useState(JSON.stringify(mockConfig, null, 2));
+  const [info, setInfo] = useState<ReturnType<typeof fetchAppInfo> extends Promise<infer T> ? T : never | null>(null);
+  const [json, setJson] = useState<string>("");
+
+  useEffect(() => {
+    let mounted = true;
+    function load() {
+      fetchAppInfo(id).then(data => {
+        if (mounted) {
+          setInfo(data);
+          setJson(JSON.stringify(data.configValue, null, 2));
+        }
+      });
+    }
+    load();
+    const interval = setInterval(load, 2000);
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
+  }, [id]);
+
+  if (!info) return <div>Loading...</div>;
 
   return (
     <div className="config-root">
       <h2>{id}</h2>
       <div className="nodes-list-row">
-        {mockNodes.map(node =>
+        {info.nodes.map(node =>
           <NodeCard key={node.id} id={node.id} status={node.status} version={node.version} />
         )}
       </div>
-      <div>
-        <div className="json-label">JSON Configuration</div>
-        <textarea
-          value={json}
-          onChange={e => setJson(e.target.value)}
-          rows={10}
-          className="json-editor"
-        />
-      </div>
+      <JsonConfigEditor
+        value={json}
+        onChange={setJson}
+        schema={info.configSchema}
+        configValue={info.configValue}
+      />
     </div>
   );
 }
