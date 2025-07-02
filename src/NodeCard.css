@@ -1,0 +1,50 @@
+.node-card {
+  width: 150px;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 12px;
+  background: #191919;
+  color: #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  font-size: 13px;
+}
+
+.node-card-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.node-card-right {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+}
+
+.node-id {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.node-status {
+  font-weight: 500;
+  font-size: 12px;
+}
+
+.node-status.synced {
+  color: #4caf50;
+}
+
+.node-status.unsynced {
+  color: #ff9800;
+}
+
+.node-version {
+  font-size: 11px;
+  color: #bbb;
+  margin-left: auto;
+}
