@@ -4,6 +4,8 @@ type Node = {
 };
 
 export type AppInfo = {
+  id: string;
+  name: string;
   nodes: { [id: string]: Node };
   schema: any;
   configuration: any;
@@ -20,10 +22,15 @@ export function fetchAppInfo(appId: string): Promise<AppInfo> {
 }
 
 export function fetchApps(): Promise<AppSummary[]> {
-  return Promise.resolve([
-    { id: "orion", name: "Orion Cloud" },
-    { id: "zenith", name: "Zenith Analytics" },
-    { id: "atlas", name: "Atlas Gateway" },
-    { id: "nova", name: "Nova Sync" }
-  ]);
+  return fetch('/apps')
+    .then(r => r.json())
+    .then(data => data.items)
+}
+
+export function patchAppName(appId: string, name: string): Promise<{ id: string; name: string }> {
+  return fetch(`/apps/${appId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name })
+  }).then(r => r.json())
 }

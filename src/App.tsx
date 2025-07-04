@@ -8,7 +8,13 @@ function App() {
   const [apps, setApps] = useState<{ id: string; name: string }[]>([]);
 
   useEffect(() => {
-    fetchApps().then(setApps);
+    fetchApps().then(setApps)
+    function handleAppNameUpdated(e: Event) {
+      const custom = e as CustomEvent<{ id: string; name: string }>
+      setApps(apps => apps.map(app => app.id === custom.detail.id ? { ...app, name: custom.detail.name } : app))
+    }
+    window.addEventListener('app-name-updated', handleAppNameUpdated)
+    return () => window.removeEventListener('app-name-updated', handleAppNameUpdated)
   }, []);
 
   return (
